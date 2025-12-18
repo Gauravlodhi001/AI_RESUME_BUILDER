@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import LandingPage from './components/Auth/LandingPage';
-import ResumeBuilder from './components/ResumBuilder/ResumeBuilder';
+import ResumeBuilder from './components/ResumeBuilder/ResumeBuilder';
 import useAuth from './hooks/useAuth';
 
 function App() {
@@ -29,5 +29,7 @@ function App() {
     </>
   );
 }
+
+
 
 export default App;
