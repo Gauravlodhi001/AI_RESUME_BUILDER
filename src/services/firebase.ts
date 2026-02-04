@@ -9,21 +9,20 @@ declare global {
   var __app_id: string | undefined;
 }
 
-const firebaseConfig = typeof window !== 'undefined' && window.__firebase_config 
-  ? JSON.parse(window.__firebase_config)
-  : {
-      apiKey: 'AIzaSyC5V7h8kL9mN0oP1qR2sT3uV4wX5yZ6aB7',
-      authDomain: 'ai-resume-builder.firebaseapp.com',
-      projectId: 'ai-resume-builder',
-      storageBucket: 'ai-resume-builder.appspot.com',
-      messagingSenderId: '123456789',
-      appId: '1:123456789:web:abc123def456'
-    };
+// Read config from Vite environment variables (VITE_ prefix) to avoid committing secrets.
+const firebaseConfig = {
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || '',
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || '',
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || '',
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || '',
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '',
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || '',
+};
 
 export { firebaseConfig };
 
-const initialAuthToken = typeof window !== 'undefined' && window.__initial_auth_token ? window.__initial_auth_token : null;
-export const appId = typeof window !== 'undefined' && window.__app_id ? window.__app_id : 'default-app-id';
+const initialAuthToken = import.meta.env.VITE_INITIAL_AUTH_TOKEN || null;
+export const appId = import.meta.env.VITE_APP_ID || 'default-app-id';
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
