@@ -1,11 +1,13 @@
 import { getFunctions, httpsCallable } from 'firebase/functions';
-import { app } from './firebase';
+import { firebaseConfig } from './firebase';
+import { initializeApp } from 'firebase/app';
 
 interface AiResponse {
   text: string;
   sources: { uri: string; title: string }[];
 }
 
+const app = initializeApp(firebaseConfig);
 const functions = getFunctions(app);
 
 // Callable function to interact with the AI model

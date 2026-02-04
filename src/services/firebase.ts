@@ -3,9 +3,27 @@ import { getFirestore, collection, doc } from 'firebase/firestore';
 import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, User } from 'firebase/auth';
 
 // The Firebase configuration and custom auth token are provided by the canvas environment.
-const firebaseConfig = JSON.parse(__firebase_config);
-const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-export const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+declare global {
+  var __firebase_config: string | undefined;
+  var __initial_auth_token: string | undefined;
+  var __app_id: string | undefined;
+}
+
+const firebaseConfig = typeof window !== 'undefined' && window.__firebase_config 
+  ? JSON.parse(window.__firebase_config)
+  : {
+      apiKey: 'AIzaSyC5V7h8kL9mN0oP1qR2sT3uV4wX5yZ6aB7',
+      authDomain: 'ai-resume-builder.firebaseapp.com',
+      projectId: 'ai-resume-builder',
+      storageBucket: 'ai-resume-builder.appspot.com',
+      messagingSenderId: '123456789',
+      appId: '1:123456789:web:abc123def456'
+    };
+
+export { firebaseConfig };
+
+const initialAuthToken = typeof window !== 'undefined' && window.__initial_auth_token ? window.__initial_auth_token : null;
+export const appId = typeof window !== 'undefined' && window.__app_id ? window.__app_id : 'default-app-id';
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
