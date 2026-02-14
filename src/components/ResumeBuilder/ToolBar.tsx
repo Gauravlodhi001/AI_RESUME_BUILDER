@@ -3,19 +3,31 @@ interface ToolbarProps {
   updateResume: any;
   saveResume: () => void;
   updateTemplate: (templateId: string) => void;
+  handleDownloadPDF: () => void;
+  isDownloading: boolean;
 }
 
-const Toolbar = ({ saveResume, updateTemplate, resume }: ToolbarProps) => {
+const Toolbar = ({ saveResume, updateTemplate, resume, handleDownloadPDF, isDownloading }: ToolbarProps) => {
   const currentTemplate = resume?.data?.templateId || 'modern';
 
   return (
-    <div className="w-20 bg-slate-800 border-l border-gray-700 flex flex-col items-center py-4 space-y-6">
+    <div className="w-24 bg-slate-800 border-l border-gray-700 flex flex-col items-center py-4 space-y-4">
+      <button
+        onClick={handleDownloadPDF}
+        disabled={isDownloading}
+        className="w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl text-white hover:from-green-400 hover:to-emerald-500 shadow-lg flex flex-col items-center justify-center gap-2 transition-all transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+        title="Download PDF"
+      >
+        <span className="text-2xl">{isDownloading ? '⏳' : '⬇️'}</span>
+        <span className="text-[10px] font-bold leading-tight text-center">Download PDF</span>
+      </button>
+
       <button
         onClick={saveResume}
-        className="p-3 bg-blue-600 rounded-full text-white hover:bg-blue-500 shadow-lg"
-        title="Save Resume"
+        className="text-gray-400 hover:text-white text-xs flex items-center gap-1 hover:bg-slate-700 px-2 py-1 rounded transition-colors"
+        title="Save to Cloud"
       >
-        💾
+        <span>☁️</span> Save
       </button>
 
       <div className="w-full border-t border-gray-700 my-2"></div>

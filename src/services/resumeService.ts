@@ -7,8 +7,21 @@ export interface ResumeData {
   email: string;
   phone: string;
   summary: string;
+  website?: string;
+  linkedin?: string;
+  address?: string;
+  profileImage?: string; // Base64 encoded image
   sections: any;
   templateId: string;
+  sectionTitles?: {
+    personal: string;
+    summary: string;
+    experience: string;
+    education: string;
+    skills: string;
+    references: string;
+    [key: string]: string;
+  };
 }
 
 export class Resume {

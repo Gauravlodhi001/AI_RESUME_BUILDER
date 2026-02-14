@@ -1,25 +1,26 @@
 // src/components/ResumeBuilder/Canvas.tsx
 import { Resume } from '../../services/resumeService';
-import ModernTemplate from './Templates/ModernTemplate';
-import ProfessionalTemplate from './Templates/ProfessionalTemplate';
-import MinimalistTemplate from './Templates/MinimalistTemplate';
+import TemplateDani from './Templates/TemplateDani';
 
 interface CanvasProps {
 	resume: Resume;
+	updateResume: (data: any) => void;
 }
 
-const Canvas = ({ resume }: CanvasProps) => {
-	const templateId = resume.data.templateId || 'modern';
+const Canvas = ({ resume, updateResume }: CanvasProps) => {
+	const templateId = resume.data.templateId || 'dani';
 
 	const renderTemplate = () => {
 		switch (templateId) {
-			case 'professional':
-				return <ProfessionalTemplate resume={resume} />;
-			case 'minimalist':
-				return <MinimalistTemplate resume={resume} />;
-			case 'modern':
+			// case 'professional':
+			// 	return <ProfessionalTemplate resume={resume} />;
+			// case 'minimalist':
+			// 	return <MinimalistTemplate resume={resume} />;
+			// case 'modern':
+			// 	return <ModernTemplate resume={resume} />;
+			case 'dani':
 			default:
-				return <ModernTemplate resume={resume} />;
+				return <TemplateDani resume={resume} updateResume={updateResume} />;
 		}
 	};
 

@@ -24,8 +24,8 @@ export const generateResumeContent = async (prompt: string, currentData: ResumeD
   }
 
   try {
-    // Using 'gemini-2.0-flash-exp' which often has better free tier availability
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+    // Using 'gemini-3-flash-preview' as requested by the user
+    const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
 
     const systematicPrompt = `
       You are an expert AI Resume Builder. 
@@ -37,10 +37,14 @@ export const generateResumeContent = async (prompt: string, currentData: ResumeD
       **INSTRUCTIONS:**
       1. Return ONLY valid JSON matching the 'ResumeData' structure.
       2. Do NOT return markdown formatting (no \`\`\`json).
-      3. Update the fields relevant to the user's prompt (e.g., summary, experience, skills).
-      4. Keep existing data if it shouldn't be changed.
-      5. If the user asks for "Suggest Skills", add relevant skills to the 'skills' array.
-      6. If the user asks for "Add Skill [SkillName]", add it to the 'skills' array.
+      3. **PROFESSIONAL FORMATTING RULES:**
+         - **Capitalization:** ALWAYS capitalize names, job titles, companies, and schools (e.g., "gaurav lodhi" -> "Gaurav Lodhi").
+         - **Grammar:** Fix any typos or grammatical errors in the user's prompt or existing data.
+         - **Tone:** Ensure all descriptions are professional, action-oriented, and concise.
+      4. Update the fields relevant to the user's prompt.
+      5. Keep existing data if it isn't relevant to the prompt.
+      6. If the user asks for "Suggest Skills", add relevant skills to the 'skills' array.
+      7. If the user asks for "Add Skill [SkillName]", add it to the 'skills' array.
       
       Output Structure:
       {
