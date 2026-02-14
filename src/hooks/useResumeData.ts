@@ -52,6 +52,10 @@ export const useResumeData = (userId: string) => {
     });
   };
 
+  const updateTemplate = (templateId: string) => {
+    updateResume({ templateId });
+  };
+
   const saveResume = async () => {
     setIsSaving(true);
     try {
@@ -65,5 +69,5 @@ export const useResumeData = (userId: string) => {
     }
   };
 
-  return { resume, loading, updateResume, saveResume, isSaving };
+  return { resume, loading, updateResume, saveResume, isSaving, updateTemplate };
 };

@@ -1,16 +1,5 @@
-import { doc, getDoc, setDoc, updateDoc, deleteDoc } from 'firebase/firestore';
-import { getPrivateDocRef, getPrivateCollectionRef } from './firebase';
-
-// A converter to ensure type safety when interacting with Firestore
-export const resumeConverter = {
-  toFirestore: (resume: Resume) => ({
-    ...resume.data,
-  }),
-  fromFirestore: (snapshot: any, options: any) => {
-    const data = snapshot.data(options);
-    return new Resume({ ...data, id: snapshot.id });
-  },
-};
+import { getDoc, setDoc, deleteDoc } from 'firebase/firestore';
+import { getPrivateDocRef } from './firebase';
 
 export interface ResumeData {
   id: string;
@@ -23,8 +12,19 @@ export interface ResumeData {
 }
 
 export class Resume {
-  constructor(public data: ResumeData) {}
+  constructor(public data: ResumeData) { }
 }
+
+// A converter to ensure type safety when interacting with Firestore
+export const resumeConverter = {
+  toFirestore: (resume: Resume) => ({
+    ...resume.data,
+  }),
+  fromFirestore: (snapshot: any, options: any) => {
+    const data = snapshot.data(options);
+    return new Resume({ ...data, id: snapshot.id });
+  },
+};
 
 export async function getResumeById(resumeId: string): Promise<Resume | null> {
   const resumeRef = getPrivateDocRef('resumes', resumeId).withConverter(resumeConverter);

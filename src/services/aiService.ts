@@ -1,39 +1,136 @@
-import { getFunctions, httpsCallable } from 'firebase/functions';
-import { firebaseConfig } from './firebase';
-import { initializeApp } from 'firebase/app';
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import { ResumeData } from './resumeService';
 
-interface AiResponse {
-  text: string;
-  sources: { uri: string; title: string }[];
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+
+// Initialize Gemini
+let genAI: GoogleGenerativeAI | null = null;
+if (API_KEY && API_KEY !== 'your_gemini_api_key_here') {
+  genAI = new GoogleGenerativeAI(API_KEY);
 }
 
-const app = initializeApp(firebaseConfig);
-const functions = getFunctions(app);
+// Helper to clean JSON string
+const cleanJsonString = (str: string) => {
+  return str.replace(/```json/g, '').replace(/```/g, '').trim();
+};
 
-// Callable function to interact with the AI model
-const generateContent = httpsCallable<any, AiResponse>(functions, 'generateContent');
+export const generateResumeContent = async (prompt: string, currentData: ResumeData): Promise<Partial<ResumeData>> => {
+  console.log('Generating resume content with Gemini:', prompt);
 
-export const generateSummary = async (jobDescription: string): Promise<string> => {
-  const prompt = `Act as a professional resume writer. Generate a concise, 3-4 sentence professional summary for a resume. The user's work experience is: "Developed web applications using React and Node.js. Led a team of 5 engineers. Managed project deadlines." The job description is: "${jobDescription}". Use keywords from the job description and make the summary impactful.`;
+  if (!genAI) {
+    console.warn('Gemini API Key missing or invalid.');
+    // Fallback to mock logic if no key
+    return mockGenerate(prompt, currentData);
+  }
 
   try {
-    const result = await generateContent({ prompt });
-    return result.data.text;
-  } catch (error) {
-    console.error('Error generating summary:', error);
-    throw new Error('Failed to generate summary.');
+    // Using 'gemini-2.0-flash-exp' which often has better free tier availability
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+
+    const systematicPrompt = `
+      You are an expert AI Resume Builder. 
+      The user wants you to update their resume data based on this prompt: "${prompt}".
+      
+      Current Resume Data (JSON):
+      ${JSON.stringify(currentData)}
+
+      **INSTRUCTIONS:**
+      1. Return ONLY valid JSON matching the 'ResumeData' structure.
+      2. Do NOT return markdown formatting (no \`\`\`json).
+      3. Update the fields relevant to the user's prompt (e.g., summary, experience, skills).
+      4. Keep existing data if it shouldn't be changed.
+      5. If the user asks for "Suggest Skills", add relevant skills to the 'skills' array.
+      6. If the user asks for "Add Skill [SkillName]", add it to the 'skills' array.
+      
+      Output Structure:
+      {
+        "name": string,
+        "email": string,
+        "phone": string,
+        "summary": string,
+        "templateId": string,
+        "sections": {
+          "role": string,
+          "skills": string[],
+          "experience": [
+            { "id": string, "company": string, "role": string, "date": string, "description": string }
+          ],
+          "education": [
+            { "id": string, "school": string, "degree": string, "date": string, "description": string }
+          ]
+        }
+      }
+    `;
+
+    const result = await model.generateContent(systematicPrompt);
+    const responseText = result.response.text();
+    const cleanedJson = cleanJsonString(responseText);
+
+    const parsedData = JSON.parse(cleanedJson);
+    return parsedData;
+
+  } catch (error: any) {
+    console.warn('Gemini API Error (Falling back to Mock):', error.message);
+
+    // Fallback to mock if API fails (429, 404, etc.)
+    const mockResult = await mockGenerate(prompt, currentData);
+
+    // Add a small note to the summary indicating it's a mock result
+    if (mockResult.summary && !mockResult.summary.includes('(Generated offline')) {
+      mockResult.summary += " (Generated offline due to high AI traffic)";
+    }
+
+    return mockResult;
   }
 };
 
-export const generateBulletPoints = async (jobDescription: string): Promise<string[]> => {
-  const prompt = `Act as a professional resume writer. Rewrite the following job duties into powerful, metrics-driven bullet points for a resume. Focus on achievements and impact. The job duties are: "Developed and maintained web applications. Collaborated with a team on new features." The job description is: "${jobDescription}".`;
+// --- Mock Fallback (Keep for when API key is missing) ---
+// --- Mock Fallback (Keep for when API key is missing) ---
+const mockGenerate = async (prompt: string, currentData: ResumeData): Promise<Partial<ResumeData>> => {
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  const lowerPrompt = prompt.toLowerCase();
 
-  try {
-    const result = await generateContent({ prompt });
-    // Assuming the AI returns a markdown list, parse it into an array
-    return result.data.text.split('\n').map(line => line.replace(/^- /, '').trim()).filter(Boolean);
-  } catch (error) {
-    console.error('Error generating bullet points:', error);
-    throw new Error('Failed to generate bullet points.');
+  // Skill Suggestions
+  if (lowerPrompt.includes('suggest skills') || lowerPrompt.includes('skills for')) {
+    const skills = ['Communication', 'Teamwork', 'Git'];
+    if (lowerPrompt.includes('java')) skills.push('Java', 'Spring Boot', 'Microservices');
+    if (lowerPrompt.includes('react') || lowerPrompt.includes('frontend')) skills.push('React', 'TypeScript', 'Tailwind');
+    if (lowerPrompt.includes('python')) skills.push('Python', 'Django', 'FastAPI');
+
+    const currentSkills = currentData.sections.skills || [];
+    return {
+      sections: {
+        ...currentData.sections,
+        skills: Array.from(new Set([...currentSkills, ...skills]))
+      },
+      summary: currentData.summary + " (Skills added offline)"
+    };
   }
+
+  // Add specific skill
+  if (lowerPrompt.startsWith('add skill')) {
+    const skill = prompt.replace(/add skill/i, '').trim();
+    if (skill) {
+      return {
+        sections: {
+          ...currentData.sections,
+          skills: [...(currentData.sections.skills || []), skill]
+        },
+        summary: currentData.summary // Keep existing summary
+      };
+    }
+  }
+
+  if (lowerPrompt.includes('software engineer')) {
+    return {
+      summary: 'Passionate Software Engineer with expertise in React, TypeScript, and Node.js.',
+      sections: {
+        ...currentData.sections,
+        role: 'Software Engineer',
+        skills: ['React', 'TypeScript', 'Node.js'],
+      }
+    };
+  }
+
+  return { summary: `Offline Mode (Quota Exceeded): Processed "${prompt}". Try "Suggest skills for React" or "Add skill Docker"` };
 };

@@ -1,51 +1,45 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore, collection, doc } from 'firebase/firestore';
-import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, User } from 'firebase/auth';
+import { getAuth } from 'firebase/auth';
 
-// The Firebase configuration and custom auth token are provided by the canvas environment.
-declare global {
-  var __firebase_config: string | undefined;
-  var __initial_auth_token: string | undefined;
-  var __app_id: string | undefined;
-}
-
-// Read config from Vite environment variables (VITE_ prefix) to avoid committing secrets.
+// Read config from Vite environment variables
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || '',
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || '',
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || '',
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || '',
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '',
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || '',
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
 export { firebaseConfig };
 
-const initialAuthToken = import.meta.env.VITE_INITIAL_AUTH_TOKEN || null;
 export const appId = import.meta.env.VITE_APP_ID || 'default-app-id';
 
 // Initialize Firebase
+if (!firebaseConfig.apiKey) {
+  console.error('Firebase: Missing API key. Please check your .env.local file.');
+}
+
+import { getAnalytics } from 'firebase/analytics';
+
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = getAuth(app);
+export const analytics = getAnalytics(app);
+
+export {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut,
+  updateProfile
+} from 'firebase/auth';
 
 // Function to handle the custom authentication token
-export async function authenticateWithToken(): Promise<User> {
-  try {
-    if (initialAuthToken) {
-      const userCredential = await signInWithCustomToken(auth, initialAuthToken);
-      console.log('Signed in with custom token!', userCredential.user);
-      return userCredential.user;
-    } else {
-      const userCredential = await signInAnonymously(auth);
-      console.log('Signed in anonymously!', userCredential.user);
-      return userCredential.user;
-    }
-  } catch (error: any) {
-    console.error('Firebase authentication failed:', error);
-    throw error;
-  }
-}
+// export async function authenticateWithToken(): Promise<User> {
+//   ... (removed)
+// }
 
 // Function to get a document reference for private user data
 export function getPrivateDocRef(collectionPath: string, docId: string) {

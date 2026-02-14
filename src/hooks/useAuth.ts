@@ -1,7 +1,6 @@
-
 import { useState, useEffect } from 'react';
-import { User } from 'firebase/auth';
-import { auth, authenticateWithToken } from '../services/firebase';
+import { User, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from 'firebase/auth';
+import { auth } from '../services/firebase';
 
 const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -9,28 +8,18 @@ const useAuth = () => {
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(firebaseUser => {
-      if (firebaseUser) {
-        setUser(firebaseUser);
-        setLoading(false);
-      }
+      setUser(firebaseUser);
+      setLoading(false);
     });
 
-    if (!user) {
-      authenticateWithToken()
-        .then(signedInUser => {
-          setUser(signedInUser);
-          setLoading(false);
-        })
-        .catch(error => {
-          console.error('Authentication failed:', error);
-          setLoading(false);
-        });
-    }
-
     return () => unsubscribe();
-  }, [user]);
+  }, []);
 
-  return { user, loading };
+  const login = (email: string, password: string) => signInWithEmailAndPassword(auth, email, password);
+  const register = (email: string, password: string) => createUserWithEmailAndPassword(auth, email, password);
+  const logout = () => signOut(auth);
+
+  return { user, loading, login, register, logout };
 };
 
 export default useAuth;

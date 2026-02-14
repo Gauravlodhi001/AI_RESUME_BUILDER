@@ -1,0 +1,10 @@
+﻿src/components/Auth/LandingPage.tsx(3,20): error TS1261: Already included file name 'G:/Projects/AI_RESUME_BUILDER/src/components/Auth/SignUp.tsx' differs from file name 'G:/Projects/AI_RESUME_BUILDER/src/components/Auth/Signup.tsx' only in casing.
+  The file is in the program because:
+    Imported via './SignUp' from file 'G:/Projects/AI_RESUME_BUILDER/src/components/Auth/LandingPage.tsx'
+    Matched by include pattern 'src' in 'G:/Projects/AI_RESUME_BUILDER/tsconfig.app.json'
+src/components/ResumeBuilder/ResumeBuilder.tsx(5,1): error TS6133: 'ToolBar' is declared but its value is never read.
+src/components/ResumeBuilder/ResumeBuilder.tsx(48,10): error TS2552: Cannot find name 'Toolbar'. Did you mean 'ToolBar'?
+src/services/firebase.ts(3,61): error TS6133: 'onAuthStateChanged' is declared but its value is never read.
+src/services/resumeService.ts(1,10): error TS6133: 'doc' is declared but its value is never read.
+src/services/resumeService.ts(1,31): error TS6133: 'updateDoc' is declared but its value is never read.
+src/services/resumeService.ts(2,28): error TS6133: 'getPrivateCollectionRef' is declared but its value is never read.

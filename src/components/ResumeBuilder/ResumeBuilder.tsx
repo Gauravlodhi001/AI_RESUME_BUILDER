@@ -2,7 +2,8 @@ import { useState } from 'react';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import Canvas from './Canvas';
-import Toolbar from './Toolbar';
+import ToolBar from './ToolBar';
+import AIAssistant from './AIAssistant';
 import { useResumeData } from '../../hooks/useResumeData';
 
 interface ResumeBuilderProps {
@@ -11,7 +12,7 @@ interface ResumeBuilderProps {
 }
 
 const ResumeBuilder = ({ user, navigate }: ResumeBuilderProps) => {
-  const { resume, updateResume, saveResume } = useResumeData(user?.uid || '');
+  const { resume, updateResume, saveResume, updateTemplate } = useResumeData(user?.uid || '');
   const [activeSection, setActiveSection] = useState('personal');
 
   const sections = [
@@ -32,23 +33,35 @@ const ResumeBuilder = ({ user, navigate }: ResumeBuilderProps) => {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-slate-900">
+    <div className="flex flex-col h-screen bg-slate-900 relative">
       <Header />
       <div className="flex flex-1 overflow-hidden">
-        <Sidebar 
-          resume={resume}
-          updateResume={updateResume}
-          sections={sections}
-          activeSection={activeSection}
-          setActiveSection={setActiveSection}
-        />
-        <main className="flex-1 overflow-auto p-8 flex justify-center">
+        {/* Left Column: Navigation & Forms */}
+        <div className="flex flex-col h-full border-r border-gray-700">
+          <Sidebar
+            resume={resume}
+            updateResume={updateResume}
+            sections={sections}
+            activeSection={activeSection}
+            setActiveSection={setActiveSection}
+          />
+          <ToolBar
+            resume={resume}
+            updateResume={updateResume}
+            saveResume={saveResume}
+            updateTemplate={updateTemplate}
+          />
+        </div>
+
+        {/* Center Column: Canvas */}
+        <main className="flex-1 overflow-auto p-8 flex justify-center bg-gray-800 relative">
           <Canvas resume={resume} />
         </main>
-        <Toolbar
+
+        {/* Right Column: AI Agent */}
+        <AIAssistant
           resume={resume}
           updateResume={updateResume}
-          saveResume={saveResume}
         />
       </div>
     </div>
