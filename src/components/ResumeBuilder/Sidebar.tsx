@@ -7,8 +7,6 @@ import {
     GraduationCap,
     Code,
     Users,
-    Download,
-    LayoutTemplate,
     ChevronRight,
     ChevronDown
 } from 'lucide-react';
@@ -20,13 +18,9 @@ interface SidebarProps {
     updateSectionName: (id: string, name: string) => void;
     activeSection: string;
     setActiveSection: (section: string) => void;
-    handleDownloadPDF: () => void;
-    isDownloading: boolean;
-    updateTemplate: (id: string) => void;
 }
 
-const Sidebar = ({ resume, updateResume, sections, updateSectionName, activeSection, setActiveSection, handleDownloadPDF, isDownloading, updateTemplate }: SidebarProps) => {
-    const currentTemplate = resume.data.templateId || 'dani';
+const Sidebar = ({ resume, updateResume, sections, updateSectionName, activeSection, setActiveSection }: SidebarProps) => { // Removed props not needed anymore
     const [editingSection, setEditingSection] = useState<string | null>(null);
     const [editValue, setEditValue] = useState('');
 
@@ -242,53 +236,7 @@ const Sidebar = ({ resume, updateResume, sections, updateSectionName, activeSect
                 ))}
             </div>
 
-            {/* Themes & Templates */}
-            <div className="p-4 border-t border-gray-800 bg-[#0f172a]">
-                <div className="mb-4">
-                    <h3 className="text-xs font-bold text-gray-500 mb-3 uppercase tracking-wider">Templates</h3>
-                    <div className="grid grid-cols-4 gap-2">
-                        {['modern', 'professional', 'minimalist', 'dani'].map((id) => (
-                            <button
-                                key={id}
-                                onClick={() => updateTemplate(id)}
-                                className={`aspect-square rounded-lg border-2 transition-all relative overflow-hidden group ${currentTemplate === id ? 'border-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.3)]' : 'border-gray-700 hover:border-gray-500'
-                                    }`}
-                                title={id.charAt(0).toUpperCase() + id.slice(1)}
-                            >
-                                <div className={`w-full h-full bg-gray-800 ${id === 'modern' ? 'bg-gradient-to-br from-gray-700 to-gray-900' :
-                                    id === 'professional' ? 'bg-slate-700' :
-                                        id === 'minimalist' ? 'bg-white' : 'bg-[#1e293b]'
-                                    }`}>
-                                    {/* Mini preview specific to template type */}
-                                    <div className="opacity-30 p-1 space-y-1">
-                                        <div className="h-1 w-1/2 bg-current rounded-full mb-2"></div>
-                                        <div className="h-0.5 w-full bg-current rounded-full"></div>
-                                        <div className="h-0.5 w-full bg-current rounded-full"></div>
-                                    </div>
-                                </div>
-                                {currentTemplate === id && (
-                                    <div className="absolute inset-0 bg-cyan-500/20 flex items-center justify-center">
-                                        <div className="w-2 h-2 bg-cyan-400 rounded-full shadow-[0_0_5px_cyan]"></div>
-                                    </div>
-                                )}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-
-                <button
-                    onClick={handleDownloadPDF}
-                    disabled={isDownloading}
-                    className="w-full bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed group"
-                >
-                    {isDownloading ? (
-                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    ) : (
-                        <Download size={18} className="group-hover:animate-bounce" />
-                    )}
-                    <span>DOWNLOAD PDF</span>
-                </button>
-            </div>
+            {/* Template Selection & Download removed from here */}
         </aside>
     );
 };

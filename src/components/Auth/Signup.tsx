@@ -21,7 +21,12 @@ const SignUp = ({ navigate, onToggle }: SignUpProps) => {
       navigate('builder');
     } catch (error: any) {
       console.error('Error signing up:', error);
-      alert('Failed to sign up: ' + error.message);
+      if (error.code === 'auth/email-already-in-use') {
+        alert('This email is already registered. Please sign in instead.');
+        onToggle(); // Switch to Sign In mode
+      } else {
+        alert('Failed to sign up: ' + error.message);
+      }
     } finally {
       setLoading(false);
     }

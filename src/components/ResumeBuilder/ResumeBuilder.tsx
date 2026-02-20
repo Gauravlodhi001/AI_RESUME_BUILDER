@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Sidebar from './Sidebar';
 import Canvas from './Canvas';
-import AIAssistant from './AIAssistant';
+import RightSidebar from './RightSidebar';
 import { useResumeData } from '../../hooks/useResumeData';
 
 // @ts-ignore
@@ -56,15 +56,25 @@ const ResumeBuilder = ({ user, navigate }: ResumeBuilderProps) => {
     const opt = {
       margin: 0,
       filename: `${resume.data.name.replace(/\s+/g, '_')}_Resume.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
+      image: { type: 'jpeg' as const, quality: 0.98 },
       html2canvas: { scale: 2, useCORS: true },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' as const }
     };
 
     html2pdf().set(opt).from(element).save().then(() => {
       setIsDownloading(false);
     });
   };
+
+  // Scroll to active section when it changes
+  useEffect(() => {
+    if (activeSection) {
+      const sectionElement = document.getElementById(activeSection);
+      if (sectionElement) {
+        sectionElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  }, [activeSection]);
 
   if (!user) {
     return (
@@ -86,9 +96,6 @@ const ResumeBuilder = ({ user, navigate }: ResumeBuilderProps) => {
           updateSectionName={updateSectionName}
           activeSection={activeSection}
           setActiveSection={setActiveSection}
-          handleDownloadPDF={handleDownloadPDF}
-          isDownloading={isDownloading}
-          updateTemplate={updateTemplate}
         />
 
       </div>
@@ -100,11 +107,14 @@ const ResumeBuilder = ({ user, navigate }: ResumeBuilderProps) => {
         </div>
       </main>
 
-      {/* Right Column: AI Agent */}
-      <div className="w-[320px] flex-shrink-0 h-full border-l border-gray-700">
-        <AIAssistant
+      {/* Right Column: Tools & AI Agent */}
+      <div className="w-[340px] flex-shrink-0 h-full">
+        <RightSidebar
           resume={resume}
           updateResume={updateResume}
+          handleDownloadPDF={handleDownloadPDF}
+          isDownloading={isDownloading}
+          updateTemplate={updateTemplate}
         />
       </div>
     </div>

@@ -1,7 +1,7 @@
 import EditableElement from './EditableElement';
 import { useRef } from 'react';
 import { Phone, Mail, MapPin, Globe, Linkedin } from 'lucide-react';
-import { Resume } from '../../services/resumeService';
+import { Resume } from '../../../services/resumeService';
 
 interface TemplateProps {
     resume: Resume;
@@ -60,7 +60,7 @@ const TemplateDani = ({ resume, updateResume }: TemplateProps) => {
     return (
         <div className="flex w-full h-full min-h-[297mm] text-gray-800 font-sans">
             {/* LEFT COLUMN (35%) */}
-            <div className="w-[35%] bg-[#f0f0f0] p-8 flex flex-col items-center pt-16">
+            <div id="personal" className="w-[35%] bg-[#f0f0f0] p-8 flex flex-col items-center pt-16">
 
                 {/* Profile Image */}
                 <div
@@ -167,7 +167,7 @@ const TemplateDani = ({ resume, updateResume }: TemplateProps) => {
                 </div>
 
                 {/* EDUCATION */}
-                <div className="w-full mb-10">
+                <div id="education" className="w-full mb-10">
                     <div className="flex justify-center mb-6">
                         <div className="bg-[#4a4a4a] text-white px-8 py-2 rounded-full font-bold tracking-widest text-sm text-center w-full max-w-[200px]">
                             <EditableElement
@@ -215,7 +215,7 @@ const TemplateDani = ({ resume, updateResume }: TemplateProps) => {
                 </div>
 
                 {/* SKILLS */}
-                <div className="w-full">
+                <div id="skills" className="w-full">
                     <div className="flex justify-center mb-6">
                         <div className="bg-[#4a4a4a] text-white px-8 py-2 rounded-full font-bold tracking-widest text-sm text-center w-full max-w-[200px]">
                             <EditableElement
@@ -266,7 +266,28 @@ const TemplateDani = ({ resume, updateResume }: TemplateProps) => {
                 </div>
 
                 {/* WORK EXPERIENCE */}
-                <div className="mb-12">
+                <div id="summary" className="mb-8">
+                    <div className="flex items-center gap-4 mb-4">
+                        <EditableElement
+                            tagName="h3"
+                            className="text-2xl font-bold text-[#333] uppercase"
+                            value={titles.summary}
+                            onChange={(val) => updateResume({ sectionTitles: { ...titles, summary: val } })}
+                        />
+                        <div className="h-[2px] bg-gray-400 flex-1"></div>
+                    </div>
+                    <EditableElement
+                        tagName="p"
+                        className="text-sm text-gray-700 leading-relaxed text-justify"
+                        value={resume.data.summary}
+                        multiline
+                        onChange={(val) => updateResume({ summary: val })}
+                        placeholder="Professional summary goes here..."
+                    />
+                </div>
+
+                {/* WORK EXPERIENCE */}
+                <div id="experience" className="mb-12">
                     <div className="flex items-center gap-4 mb-8">
                         <EditableElement
                             tagName="h3"
@@ -328,7 +349,7 @@ const TemplateDani = ({ resume, updateResume }: TemplateProps) => {
                 </div>
 
                 {/* REFERENCES */}
-                <div>
+                <div id="references">
                     <div className="flex items-center gap-4 mb-8">
                         <EditableElement
                             tagName="h3"

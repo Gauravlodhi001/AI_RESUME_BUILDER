@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import LandingPage from './components/Auth/LandingPage';
 import ResumeBuilder from './components/ResumeBuilder/ResumeBuilder';
+import Dashboard from './components/Dashboard/Dashboard';
+import About from './components/Pages/About';
+import Pricing from './components/Pages/Pricing';
 import useAuth from './hooks/useAuth';
 
 function App() {
@@ -16,16 +19,21 @@ function App() {
     return <div className="flex items-center justify-center h-screen bg-slate-900 text-white">Loading...</div>;
   }
 
-  // If user is signed in, default to builder unless they want to go back
-  if (user && currentPage === 'landing') {
-     // Optional: Auto-redirect to builder if logged in
-     // setCurrentPage('builder');
+  // If user is signed in, default to dashboard.
+  // Note: In a real auth flow, we might handle this differently, but simple check works here.
+  const isAuthPage = currentPage === 'landing' || currentPage === 'about' || currentPage === 'pricing';
+  if (user && isAuthPage) {
+    // Optional: Redirect to dashboard if logged in and on landing page
+    // if (currentPage === 'landing') setCurrentPage('dashboard');
   }
 
   return (
     <>
       {currentPage === 'landing' && <LandingPage navigate={navigate} />}
       {currentPage === 'builder' && <ResumeBuilder user={user} navigate={navigate} />}
+      {currentPage === 'dashboard' && <Dashboard user={user} navigate={navigate} />}
+      {currentPage === 'about' && <About navigate={navigate} />}
+      {currentPage === 'pricing' && <Pricing navigate={navigate} />}
     </>
   );
 }
