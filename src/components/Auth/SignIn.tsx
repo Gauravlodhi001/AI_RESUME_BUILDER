@@ -13,15 +13,17 @@ const SignIn = ({ navigate, onToggle }: SignInProps) => {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
 
   const handleSignIn = async () => {
     setLoading(true);
+    setErrorMsg('');
     try {
       await login(email, password);
       navigate('builder');
     } catch (error: any) {
       console.error('Error signing in:', error);
-      alert('Failed to sign in: ' + error.message);
+      setErrorMsg('Failed to sign in: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -46,6 +48,9 @@ const SignIn = ({ navigate, onToggle }: SignInProps) => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
+        {errorMsg && (
+          <p className="text-red-400 text-sm mt-2">{errorMsg}</p>
+        )}
       </div>
 
       <Button

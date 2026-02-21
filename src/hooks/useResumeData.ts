@@ -19,9 +19,9 @@ const INITIAL_RESUME: ResumeData = {
       { id: '2', school: 'University/College Details', degree: 'Course Studied', date: '2006 - 2008', description: '' }
     ],
     experience: [
-      { id: '1', company: 'Company Name | Location', role: 'Job position here', date: '2019 - 2022', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pharetra in lorem at laoreet.' },
-      { id: '2', company: 'Company Name | Location', role: 'Job position here', date: '2017 - 2019', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
-      { id: '3', company: 'Company Name | Location', role: 'Job position here', date: '2015 - 2017', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' }
+      { id: '1', company: 'Company Name | Location', role: 'Job position here', date: '2019 - 2022', description: 'Led cross-functional teams to execute comprehensive digital marketing campaigns. Increased brand awareness by 35% within the first year by optimizing SEO strategies and launching targeted social media initiatives.' },
+      { id: '2', company: 'Company Name | Location', role: 'Job position here', date: '2017 - 2019', description: 'Managed multiple high-profile client accounts, improving ROI by an average of 25%. Developed automated reporting dashboards to track KPIs and provide actionable insights to stakeholders.' },
+      { id: '3', company: 'Company Name | Location', role: 'Job position here', date: '2015 - 2017', description: 'Conducted market research to identify new opportunities and trends. Assisted in the creation of promotional materials and coordinated events.' }
     ],
     skills: ['UI/UX', 'Visual Design', 'Wireframes', 'Storyboards', 'User Flows', 'Process Flows'],
     references: [

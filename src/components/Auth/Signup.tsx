@@ -13,19 +13,20 @@ const SignUp = ({ navigate, onToggle }: SignUpProps) => {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
 
   const handleSignUp = async () => {
     setLoading(true);
+    setErrorMsg('');
     try {
       await register(email, password);
       navigate('builder');
     } catch (error: any) {
       console.error('Error signing up:', error);
       if (error.code === 'auth/email-already-in-use') {
-        alert('This email is already registered. Please sign in instead.');
-        onToggle(); // Switch to Sign In mode
+        setErrorMsg('This email is already registered. Please sign in instead.');
       } else {
-        alert('Failed to sign up: ' + error.message);
+        setErrorMsg('Failed to sign up: ' + error.message);
       }
     } finally {
       setLoading(false);
@@ -51,6 +52,9 @@ const SignUp = ({ navigate, onToggle }: SignUpProps) => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
+        {errorMsg && (
+          <p className="text-red-400 text-sm mt-2">{errorMsg}</p>
+        )}
       </div>
 
       <Button

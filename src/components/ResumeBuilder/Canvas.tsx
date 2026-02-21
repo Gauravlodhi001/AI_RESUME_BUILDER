@@ -25,7 +25,7 @@ const Canvas = ({ resume, updateResume }: CanvasProps) => {
 	};
 
 	return (
-		<div className="w-full max-w-[210mm] min-h-[297mm] bg-white shadow-2xl overflow-hidden" id="resume-canvas">
+		<div className="w-[210mm] min-h-[297mm] bg-white shadow-2xl overflow-hidden shrink-0" id="resume-canvas">
 			{renderTemplate()}
 		</div>
 	);

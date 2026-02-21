@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Sidebar from './Sidebar';
 import Canvas from './Canvas';
 import RightSidebar from './RightSidebar';
@@ -16,6 +16,8 @@ const ResumeBuilder = ({ user, navigate }: ResumeBuilderProps) => {
   const { resume, updateResume, updateTemplate } = useResumeData(user?.uid || '');
   const [activeSection, setActiveSection] = useState('personal');
   const [isDownloading, setIsDownloading] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
 
   const [sections, setSections] = useState([
     { id: 'personal', name: 'Personal Details' },
@@ -48,11 +50,20 @@ const ResumeBuilder = ({ user, navigate }: ResumeBuilderProps) => {
   };
 
 
-  const handleDownloadPDF = () => {
+  const handleDownloadPDF = async () => {
     const element = document.getElementById('resume-canvas');
     if (!element) return;
 
     setIsDownloading(true);
+
+    // Temporarily reset scaling for proper PDF generation
+    const originalTransform = element.style.transform;
+    const originalTransformOrigin = element.style.transformOrigin;
+    element.style.transform = 'none';
+
+    // Slight delay to ensure DOM repaints before generating PDF
+    await new Promise(resolve => setTimeout(resolve, 50));
+
     const opt = {
       margin: 0,
       filename: `${resume.data.name.replace(/\s+/g, '_')}_Resume.pdf`,
@@ -61,9 +72,14 @@ const ResumeBuilder = ({ user, navigate }: ResumeBuilderProps) => {
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' as const }
     };
 
-    html2pdf().set(opt).from(element).save().then(() => {
+    try {
+      await html2pdf().set(opt).from(element).save();
+    } finally {
+      // Restore the scale
+      element.style.transform = originalTransform;
+      element.style.transformOrigin = originalTransformOrigin;
       setIsDownloading(false);
-    });
+    }
   };
 
   // Scroll to active section when it changes
@@ -75,6 +91,30 @@ const ResumeBuilder = ({ user, navigate }: ResumeBuilderProps) => {
       }
     }
   }, [activeSection]);
+
+  // Calculate scaling for the canvas
+  useEffect(() => {
+    const calculateScale = () => {
+      if (!containerRef.current) return;
+
+      const containerWidth = containerRef.current.clientWidth;
+      const padding = 64; // 32px padding on each side (p-8)
+      const availableWidth = containerWidth - padding;
+
+      // A4 width is 210mm (~794px at 96dpi)
+      const A4_PIXELS = 794;
+
+      if (availableWidth < A4_PIXELS) {
+        setScale(availableWidth / A4_PIXELS);
+      } else {
+        setScale(1);
+      }
+    };
+
+    calculateScale();
+    window.addEventListener('resize', calculateScale);
+    return () => window.removeEventListener('resize', calculateScale);
+  }, []);
 
   if (!user) {
     return (
@@ -101,9 +141,16 @@ const ResumeBuilder = ({ user, navigate }: ResumeBuilderProps) => {
       </div>
 
       {/* Center Column: Canvas */}
-      <main className="flex-1 overflow-hidden relative flex flex-col items-center bg-[#334155]/50">
-        <div className="w-full h-full overflow-auto p-8 flex justify-center custom-scrollbar">
-          <Canvas resume={resume} updateResume={updateResume} />
+      <main className="flex-1 overflow-y-auto relative bg-[#334155]/50" ref={containerRef}>
+        <div className="min-h-full py-8 flex justify-center w-full">
+          <div style={{
+            transform: `scale(${scale})`,
+            transformOrigin: 'top center',
+            height: scale !== 1 ? `${297 * 3.7795275591 * scale}px` : 'auto', // reserve height for A4 (297mm)
+            marginBottom: scale !== 1 ? `${297 * 3.7795275591 * (scale - 1)}px` : '0px'
+          }}>
+            <Canvas resume={resume} updateResume={updateResume} />
+          </div>
         </div>
       </main>
 
